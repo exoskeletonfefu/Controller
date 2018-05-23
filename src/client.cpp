@@ -5,6 +5,7 @@ using namespace std;
 Client::Client(qintptr descriptor, QObject *parent) :
     QObject(parent) {
     this->descriptor = descriptor;
+    blockSize = 0;
     init();
 }
 
@@ -45,6 +46,29 @@ void Client::slotDisconnected() {
 
 void Client::slotReadyRead() {
     qDebug() << "MyClient::readyRead()";
+
+    QByteArray data = socket->readAll();
+    int index = 0;
+    while (true) {
+        if (blockSize == 0) {
+            if (data.size() - index < 2)
+                return;
+            currentBlock.clear();
+            blockSize = quint16((unsigned char)(data[index]) << 8 | (unsigned char)(data[index + 1]));
+            index += 2;
+        }
+        if (data.size() - index < blockSize) {
+            currentBlock.append(data.mid(index, -1));
+            blockSize -= data.size() - index;
+            return;
+        }
+        currentBlock.append(data.mid(index, blockSize));
+        index += blockSize;
+        blockSize = 0;
+
+        qDebug() << currentBlock;
+        emit signReaded(currentBlock);
+    }
 }
 
 void Client::slotError(QAbstractSocket::SocketError socketError) {

@@ -3,6 +3,7 @@
 #include <QTcpSocket>
 #include <QThread>
 #include <string>
+#include <memory>
 
 class Client: public QObject {
     Q_OBJECT
@@ -13,9 +14,12 @@ public:
     qint64 write(std::string data);
 private:
     QTcpSocket *socket;
+    quint16 blockSize;
+    QByteArray currentBlock;
     int descriptor;
 signals:
     void signDeleted(int);
+    void signReaded(QString);
 public slots:
 //    void slotWrite(std::string data);
     void slotConnected();
