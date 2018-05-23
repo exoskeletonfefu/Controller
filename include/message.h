@@ -1,5 +1,10 @@
 #pragma once
 #include <string>
+#include <map>
+#include <vector>
+#include <memory>
+
+#include "field.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -7,57 +12,31 @@
 
 namespace Message {
 
-namespace Type {
+namespace Command {
 enum Type {
-    NUMBER = 0
+    INIT    = 0,
+    STATE   = 1,
+    CONTROL = 2
 };
 }
 
-//namespace Command {
-//enum Type {
-//    INIT = 0,
-//    STATE = 1
-//};
-//}
-
-class Number;
+class Field;
 
 typedef std::shared_ptr<rapidjson::Document> PDocument;
 
 class Message {
 public:
-    Message();
-    Message &add(const Number &number);
+    Message(Command::Type command, std::map<int, std::pair<void*, int>> *fields);
+    Message &add(Field &item);
     std::string getData();
     std::string getTitle() const;
     Message &setTitle(std::string title);
+    Message &setId(int id);
 private:
+    std::map<int, std::pair<void*, int>> *fields;
+    int fieldId;
     std::string title;
-    PDocument document;
-};
-
-class Number {
-public:
-    Number(int value);
-    int getValue() const;
-    std::string getTitle() const;
-    Number &setTitle(std::string title);
-private:
-    std::string title;
-    int value;
-};
-
-class Id {
-public:
-    uint8_t id;
-    Message message() {
-        return Message().setTitle("first").add(Number(id).setTitle("id")); }
-};
-
-class Test {
-public:
-    uint8_t id;
-    Message message() {
-        return Message().add(Number(id).setTitle("test")).add(Number(8).setTitle("another")); }
+    rapidjson::Document *document;
 };
 }
+

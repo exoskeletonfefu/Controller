@@ -6,25 +6,33 @@
 using namespace std;
 using namespace rapidjson;
 
-Message::Message::Message() :
+Message::Message::Message(Command::Type command, std::map<int, std::pair<void*, int>> *fields) :
     document(new Document(kObjectType)) {
+    this->fields = fields;
+    fieldId = 0;
+
     document->SetObject();
     Document::AllocatorType& alloc = document->GetAllocator();
     Value arr(kArrayType);
-//    document->AddMember("command", command, alloc);
+    document->AddMember("command", command, alloc);
+    document->AddMember("id", -1, alloc);
     document->AddMember("fields", arr, alloc);
 }
 
-Message::Message& Message::Message::add(const Number &number) {
+Message::Message& Message::Message::add(Field &item) {
+    fieldId++;
+    if (fields->find(fieldId) == fields->end())
+        fields->emplace(fieldId, std::make_pair(item.getDataPoint(), item.getSize()));
     Document::AllocatorType& alloc = document->GetAllocator();
-    Value numb(kObjectType);
-    Value str(kStringType);
-    numb.AddMember("type", Type::NUMBER, alloc);
-    str.SetString(number.getTitle().data(), alloc);
-    numb.AddMember("title", str, alloc);
-    numb.AddMember("value", number.getValue(), alloc);
-    document->GetObject()["fields"].PushBack(numb, alloc);
-//    document->AddMember("id", numb, alloc);
+    Value val(kObjectType);
+    val = item.toJson(document);
+    val.AddMember("id", fieldId, alloc);
+    document->GetObject()["fields"].PushBack(val, alloc);
+    return *this;
+}
+
+Message::Message& Message::Message::setId(int id) {
+    document->GetObject()["id"] = id;
     return *this;
 }
 
@@ -54,19 +62,3 @@ Message::Message &Message::Message::setTitle(std::string title) {
     return *this;
 }
 
-Message::Number::Number(int value) {
-    this->value = value;
-}
-
-int Message::Number::getValue() const {
-    return value;
-}
-
-std::string Message::Number::getTitle() const {
-    return title;
-}
-
-Message::Number &Message::Number::setTitle(std::string title) {
-    this->title = title;
-    return *this;
-}
