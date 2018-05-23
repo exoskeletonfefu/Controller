@@ -5,7 +5,6 @@ void Timer::run() {
         ticks++;
         if (ticks == 30) {
             emit signTimed();
-//            qDebug() << "timed()";
             ticks = 0;
         }
         usleep(10000);

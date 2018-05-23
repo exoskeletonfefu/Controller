@@ -1,5 +1,6 @@
 #pragma once
 #include <QThread>
+#include <memory>
 
 class Timer: public QThread {
     Q_OBJECT
