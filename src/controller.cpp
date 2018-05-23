@@ -17,7 +17,10 @@ Controller::Controller(QObject *parent) :
     timer = PTimer(new Timer());
 
     connect(timer.get(), SIGNAL(finished()), timer.get(), SLOT(deleteLater()));
-    connect(timer.get(), SIGNAL(signTimed()), this, SLOT(slotWriteStatus()));
+    connect(timer.get(), SIGNAL(signTimed()), this, SLOT(slotWriteState()));
+    connect(server, SIGNAL(signNewConnection(int)), this, SLOT(slotWriteInit(int)), Qt::DirectConnection);
+    connect(server, SIGNAL(signReaded(QString)), this, SLOT(slotReaded(QString)), Qt::DirectConnection);
+
     messageController = new MessageController(server);
     inMove = new Message::Move;
     messageController->addScheme(inMove, Message::Command::CONTROL);
@@ -43,10 +46,6 @@ Controller::Controller(QObject *parent) :
     timer->start();
 }
 
-void Controller::slotWriteStatus() {
-    outId->id = 5;
-    server->write(outId->message().getData());
-    server->write(outTest->message().getData());
 void Controller::pingServos() {
     for (uint8_t i = 0; i < 255; i++) {
         Servo *servo = new Servo(messageController, portHandler, packetHandler);
@@ -83,5 +82,46 @@ void Controller::parseConfig(std::string fileName) {
     deviceName = document["devicename"].GetString();
     protocolVersion = document["protocolversion"].GetFloat();
     port = document["port"].GetInt();
+}
+
+
+void Controller::slotReaded(QString data) {
+    messageController->updateControl(data);
+    for (auto &servo: servos) {
+        servo->write();
+    }
+    if (messageController->isUpdated(inMove)) {
+        for (auto &servo: servos) {
+//            int writeTxRxCatch(uint8_t id, rx24::Type addr, uint16_t length, uint8_t *data);
+            switch (inMove->moveCommand) {
+            case Message::move_command::First: {
+                uint16_t value = 0;
+                servo->writeTxRxCatch(sr518::ADDR_GOAL_POSITION_L, 2, (uint8_t*)&value);
+                break;
+            }
+            case Message::move_command::Second: {
+                uint16_t value = 500;
+                servo->writeTxRxCatch(sr518::ADDR_GOAL_POSITION_L, 2, (uint8_t*)&value);
+                break;
+            }
+            case Message::move_command::Third: {
+                uint16_t value = 1000;
+                servo->writeTxRxCatch(sr518::ADDR_GOAL_POSITION_L, 2, (uint8_t*)&value);
+                break;
+            }
+            }
+        }
+    }
+}
+
+void Controller::slotWriteState() {
+    for (auto &servo: servos) {
+        servo->read();
+    }
+    messageController->writeStates();
+}
+
+void Controller::slotWriteInit(int descriptor) {
+    messageController->writeInits(descriptor);
 }
 

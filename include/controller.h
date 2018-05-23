@@ -37,5 +37,7 @@ private:
     float protocolVersion;
     int port;
 public slots:
-    void slotWriteStatus();
+    void slotReaded(QString);
+    void slotWriteState();
+    void slotWriteInit(int descriptor);
 };
