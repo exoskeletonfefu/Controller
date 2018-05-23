@@ -26,6 +26,9 @@ private:
 protected:
     void incomingConnection(qintptr handke) override;
 signals:
+    void signNewConnection(int);
+    void signReaded(QString);
 public slots:
+    void slotReaded(QString);
     void slotEraseClient(int);
 };
