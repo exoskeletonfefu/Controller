@@ -11,6 +11,7 @@ using namespace rapidjson;
 
 Controller::Controller(QObject *parent) :
     QObject(parent) {
+    parseConfig(CONFIG);
 
     server = new Server(port);
     timer = PTimer(new Timer());
@@ -62,5 +63,25 @@ void Controller::pingServos() {
             continue;
         }
     }
+}
+
+void Controller::parseConfig(std::string fileName) {
+    FILE* input = fopen(fileName.c_str(), "rb");
+    char buffer[65536];
+    FileReadStream *is;
+    try {
+        is = new FileReadStream(input, buffer, sizeof(buffer));
+    }
+    catch(...) {
+        std::cout << "Config file not exist" << std::endl;
+        return;
+    }
+
+    Document document;
+    document.ParseStream<0, UTF8<>, FileReadStream>(*is);
+    document.GetObject();
+    deviceName = document["devicename"].GetString();
+    protocolVersion = document["protocolversion"].GetFloat();
+    port = document["port"].GetInt();
 }
 

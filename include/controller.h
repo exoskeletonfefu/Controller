@@ -12,6 +12,7 @@
 #include "messagecontroller.h"
 #include "controltable.h"
 #include "servo.h"
+
 #include "dynamixel_sdk.h"
 
 class Controller: public QObject {
@@ -21,6 +22,7 @@ public:
 //    Message::Id *outId;
 //    Message::Id *inId;
 private:
+    void parseConfig(std::string fileName);
     void pingServos();
     Server *server;
     PTimer timer;
