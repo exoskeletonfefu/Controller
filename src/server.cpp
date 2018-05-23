@@ -5,9 +5,9 @@
 
 using namespace std;
 
-Server::Server(QObject *parent) :
-    QTcpServer(parent) {
-}
+Server::Server(int port, QObject *parent) :
+    port(port),
+    QTcpServer(parent) {}
 
 void Server::start() {
     if(this->listen(QHostAddress::Any, port)) {

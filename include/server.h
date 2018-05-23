@@ -16,11 +16,12 @@
 class Server: public QTcpServer {
     Q_OBJECT
 public:
-    Server(QObject *parent = 0);
+    Server(int port, QObject *parent = 0);
     void start();
     void write(std::string data);
 private:
     std::map<qintptr, Client*> clients;
+    float port;
 protected:
     void incomingConnection(qintptr handke) override;
 signals:
