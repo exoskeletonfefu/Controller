@@ -1,0 +1,5 @@
+{
+    "devicename":      "/dev/ttyUSB0",
+    "protocolversion": 1.0,
+    "port":            1234
+}

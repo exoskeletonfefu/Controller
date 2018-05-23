@@ -17,10 +17,12 @@ INCLUDEPATH += $$PWD/include /usr/local/include/
 #LIBS += -lmessages
 #/Users/ilyazuev/CommonUbuntuVB/exoskeleton/Qt/messages/build-messages-Desktop_Qt_5_9_1_clang_64bit-Debug/libmessages.dylib
 macx {
+    DEFINES += CONFIG=\\\"$$PWD/config/config_mac\\\"
     LIBS += -L/usr/local/lib
     LIBS += -ldxl_mac_cpp
 }
 linux {
+    DEFINES += CONFIG=\\\"$$PWD/config/config_linux\\\"
     LIBS += -ldxl_x86_cpp
 }
 
