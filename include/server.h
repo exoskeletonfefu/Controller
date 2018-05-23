@@ -19,6 +19,7 @@ public:
     Server(int port, QObject *parent = 0);
     void start();
     void write(std::string data);
+    void write(std::string data, qintptr descriptor);
 private:
     std::map<qintptr, Client*> clients;
     float port;

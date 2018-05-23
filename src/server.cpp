@@ -32,3 +32,7 @@ void Server::write(std::string data) {
     for (auto &client: clients)
         client.second->write(data);
 }
+
+void Server::write(std::string data, qintptr descriptor) {
+    clients.at(descriptor)->write(data);
+}
