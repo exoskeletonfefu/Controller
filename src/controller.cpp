@@ -36,6 +36,7 @@ Controller::Controller(QObject *parent) :
 
 //    qDebug() << servoId;
 //    inId->id = servoId;
+    pingServos();
 
     server->start();
     timer->start();
@@ -45,4 +46,21 @@ void Controller::slotWriteStatus() {
     outId->id = 5;
     server->write(outId->message().getData());
     server->write(outTest->message().getData());
+void Controller::pingServos() {
+    for (uint8_t i = 0; i < 255; i++) {
+        Servo *servo = new Servo(messageController, portHandler, packetHandler);
+        try {
+            int servoId;
+            servoId = *(uint8_t*)servo->checkId(i);
+            servo->init();
+            servo->setId(servoId);
+            servos.push_back(servo);
+            qDebug() << servoId;
+        }
+        catch(std::string e) {
+            delete servo;
+            continue;
+        }
+    }
 }
+

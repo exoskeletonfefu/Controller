@@ -21,6 +21,7 @@ public:
 //    Message::Id *outId;
 //    Message::Id *inId;
 private:
+    void pingServos();
     Server *server;
     PTimer timer;
     MessageController *messageController;
