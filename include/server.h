@@ -17,7 +17,7 @@ class Server: public QTcpServer {
     Q_OBJECT
 public:
     Server(QObject *parent = 0);
-    void startServer();
+    void start();
     void write(std::string data);
 private:
     std::map<qintptr, Client*> clients;

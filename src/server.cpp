@@ -9,8 +9,8 @@ Server::Server(QObject *parent) :
     QTcpServer(parent) {
 }
 
-void Server::startServer() {
-    if(this->listen(QHostAddress::Any, 1234)) {
+void Server::start() {
+    if(this->listen(QHostAddress::Any, port)) {
         qDebug() << "Server started";
     }
     else {
